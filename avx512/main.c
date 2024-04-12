@@ -44,10 +44,8 @@ void block_mem_loader(const int N, const PRECISION *A, int lda, const PRECISION 
             A_re = _mm512_loadu_ps(A + 2 * j * lda + i * AVX512_LENGTH_float);
             A_im = _mm512_loadu_ps(A + (2 * j + 1) * lda + i * AVX512_LENGTH_float);
             // C += A*B
-#ifdef WITH_COMP
-            C_re[i] = _mm512_fmsub_ps(A_re, B_re, _mm512_fmsub_ps(A_im, B_im, C_re[i]));
-            C_im[i] = _mm512_fmadd_ps(A_im, B_re, _mm512_fmadd_ps(A_re, B_im, C_im[i]));
-#endif
+            //C_re[i] = _mm512_fmsub_ps(A_re, B_re, _mm512_fmsub_ps(A_im, B_im, C_re[i]));
+            //C_im[i] = _mm512_fmadd_ps(A_im, B_re, _mm512_fmadd_ps(A_re, B_im, C_im[i]));
         }
     }
     for (int i = 0; i < lda; i += AVX512_LENGTH_float) {
@@ -96,43 +94,3 @@ int main()
     free(B);
     free(C);
 }
-
-// Inner-product Method
-#if 0 
-{
-    const int Nsm = lda / AVX512_LENGTH_float;
-
-    for (int i = 0; i < Nsm; i++) {
-        __m512 C_re = _mm512_loadu_ps(C + 2 * i * AVX512_LENGTH_float); // idxe * 4 bytes
-        __m512 C_im = _mm512_loadu_ps(C + (2 * i + 1) * AVX512_LENGTH_float);
-        // Prof512.load.stop();
-
-        // Prof512.compute.start();
-        for (int j = 0; j < N; j++) {
-            __m512 B_re = _mm512_set1_ps(B[2 * j]);
-            __m512 B_im = _mm512_set1_ps(B[2 * j + 1]);
-            __m512 A_re = _mm512_load_ps(A + 2 * j * lda + i * AVX512_LENGTH_float);
-            __m512 A_im = _mm512_load_ps(A + (2 * j + 1) * lda + i * AVX512_LENGTH_float);
-#ifdef WITH_COMP
-            C_re = _mm512_fmsub_ps(A_re, B_re, _mm512_fmsub_ps(A_im, B_im, C_re));
-            C_im = _mm512_fmadd_ps(A_im, B_re, _mm512_fmadd_ps(A_re, B_im, C_im));
-#endif
-        }
-        _mm512_storeu_ps(C + 2 * i * AVX512_LENGTH_float, C_re);
-        _mm512_storeu_ps(C + (2 * i + 1) * AVX512_LENGTH_float, C_im);
-    }
-}
-#endif
-
-// scalar Method
-#if 0 
-    // float ret[2 * lda];
-    // for (int i = 0; i < 2 * lda; i++) { ret[i] = C[i]; }
-    // for (int i = 0; i < lda; i++) {
-    //     for (int j = 0; j < N; j++) {
-    //         ret[2 * i + 0] += A[(2 * j + 0) * lda + i] * B[2 * j + 0] - A[(2 * j + 1) * lda + i] * B[2 * j + 1];
-    //         ret[2 * i + 1] += A[(2 * j + 1) * lda + i] * B[2 * j + 0] + A[(2 * j + 0) * lda + i] * B[2 * j + 1];
-    //     }
-    // }
-    // for (int i = 0; i < 2 * lda; i++) { C[i] = ret[i]; }
-#endif
