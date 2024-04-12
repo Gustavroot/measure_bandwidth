@@ -63,8 +63,8 @@ void block_mem_loader( const int N, const PRECISION *A, int lda, const PRECISION
 
   // interleaves real and imaginary parts and stores the resulting complex numbers in C
   for ( i=0; i<lda; i+= SIMD_LENGTH_PRECISION ) {
-     A_re = _mm_unpacklo_pPRECISION( C_re[i/SIMD_LENGTH_PRECISION], C_im[i/SIMD_LENGTH_PRECISION] );
-     A_im = _mm_unpackhi_pPRECISION( C_re[i/SIMD_LENGTH_PRECISION], C_im[i/SIMD_LENGTH_PRECISION] );
+     //A_re = _mm_unpacklo_pPRECISION( C_re[i/SIMD_LENGTH_PRECISION], C_im[i/SIMD_LENGTH_PRECISION] );
+     //A_im = _mm_unpackhi_pPRECISION( C_re[i/SIMD_LENGTH_PRECISION], C_im[i/SIMD_LENGTH_PRECISION] );
      _mm_store_pPRECISION( C+2*i,                   A_re );
      _mm_store_pPRECISION( C+2*i+SIMD_LENGTH_PRECISION, A_im );
   }
@@ -93,7 +93,9 @@ int main(){
   gettimeofday(&before, NULL);
 
   for ( i=0;i<nb;i++ ) {
-    Apt = A+i*N*2*N; Bpt = B+i*2*N; Cpt = C+i*2*N;
+    Apt = A+i*N*2*N;
+    Bpt = B+i*2*N;
+    Cpt = C+i*2*N;
     block_mem_loader( N,Apt,N,Bpt,Cpt );
   }
 

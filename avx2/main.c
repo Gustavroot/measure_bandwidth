@@ -37,10 +37,10 @@ void block_mem_loader(const int N, const PRECISION *A, int lda, const PRECISION 
     for (int i = 0; i < lda; i += AVX_LENGTH_PRECISION) {
         __m256 A_re, A_im;
         __m256 B_re, B_im;
-        A_re = _mm256_permutevar8x32_ps(C_re[i / AVX_LENGTH_PRECISION], idxA);
-        A_im = _mm256_permutevar8x32_ps(C_im[i / AVX_LENGTH_PRECISION], idxA);
-        B_re = _mm256_unpacklo_ps(A_re, A_im);
-        B_im = _mm256_unpackhi_ps(A_re, A_im);
+        //A_re = _mm256_permutevar8x32_ps(C_re[i / AVX_LENGTH_PRECISION], idxA);
+        //A_im = _mm256_permutevar8x32_ps(C_im[i / AVX_LENGTH_PRECISION], idxA);
+        //B_re = _mm256_unpacklo_ps(A_re, A_im);
+        //B_im = _mm256_unpackhi_ps(A_re, A_im);
         _mm256_storeu_ps(C + 2 * i, B_re);
         _mm256_storeu_ps(C + 2 * i + AVX_LENGTH_PRECISION, B_im);
     }
@@ -53,7 +53,7 @@ int main()
     // dimension of the block
     int N  = 64;
     // number of blocks
-    int nb = 50*1E6 / sizeof(PRECISION);
+    int nb = 50 * 1E6 / sizeof(PRECISION);
 
     PRECISION *Apt, *Bpt, *Cpt;
 
