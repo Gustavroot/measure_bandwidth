@@ -2,7 +2,7 @@
 #include <xmmintrin.h>
 #include <emmintrin.h>
 #include <sys/time.h>
-
+#include "vectorized_blas_sse.h"
 
 
 #define SIMD_LENGTH_float 4
@@ -57,8 +57,10 @@ void block_mem_loader( const int N, const PRECISION *A, int lda, const PRECISION
        A_re = _mm_load_pPRECISION( A + 2*j*lda + i );
        A_im = _mm_load_pPRECISION( A + (2*j+1)*lda + i );
 
+#ifdef WITH_COMP
        // C += A*B
-       //cfmadd(A_re, A_im, B_re, B_im, &(C_re[i/SIMD_LENGTH_PRECISION]), &(C_im[i/SIMD_LENGTH_PRECISION]) );
+       cfmadd(A_re, A_im, B_re, B_im, &(C_re[i/SIMD_LENGTH_PRECISION]), &(C_im[i/SIMD_LENGTH_PRECISION]) );
+#endif
     }
   }
 
