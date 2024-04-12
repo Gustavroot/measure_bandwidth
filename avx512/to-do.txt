@@ -1,3 +1,0 @@
-Do the same as in ../sse/ , but now with AVX-512.
-
-./vectorized_blas_avx512.h is a reference file，not inclued indeed.
