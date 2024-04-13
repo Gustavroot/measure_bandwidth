@@ -28,8 +28,8 @@ void block_mem_loader(const int N, const PRECISION *A, int lda, const PRECISION 
             A_re = _mm256_loadu_ps(A + 2 * j * lda + i);
             A_im = _mm256_loadu_ps(A + (2 * j + 1) * lda + i);
 
-            //C_re[i / AVX_LENGTH_PRECISION] = _mm256_fmsub_ps(A_re, B_re, _mm256_fmsub_ps(A_im, B_im, C_re[i / AVX_LENGTH_PRECISION]));
-            //C_im[i / AVX_LENGTH_PRECISION] = _mm256_fmadd_ps(A_im, B_re, _mm256_fmadd_ps(A_re, B_im, C_im[i / AVX_LENGTH_PRECISION]));
+            C_re[i / AVX_LENGTH_PRECISION] = _mm256_fmsub_ps(A_re, B_re, _mm256_fmsub_ps(A_im, B_im, C_re[i / AVX_LENGTH_PRECISION]));
+            C_im[i / AVX_LENGTH_PRECISION] = _mm256_fmadd_ps(A_im, B_re, _mm256_fmadd_ps(A_re, B_im, C_im[i / AVX_LENGTH_PRECISION]));
         }
     }
 
@@ -37,10 +37,10 @@ void block_mem_loader(const int N, const PRECISION *A, int lda, const PRECISION 
     for (int i = 0; i < lda; i += AVX_LENGTH_PRECISION) {
         __m256 A_re, A_im;
         __m256 B_re, B_im;
-        //A_re = _mm256_permutevar8x32_ps(C_re[i / AVX_LENGTH_PRECISION], idxA);
-        //A_im = _mm256_permutevar8x32_ps(C_im[i / AVX_LENGTH_PRECISION], idxA);
-        //B_re = _mm256_unpacklo_ps(A_re, A_im);
-        //B_im = _mm256_unpackhi_ps(A_re, A_im);
+        A_re = _mm256_permutevar8x32_ps(C_re[i / AVX_LENGTH_PRECISION], idxA);
+        A_im = _mm256_permutevar8x32_ps(C_im[i / AVX_LENGTH_PRECISION], idxA);
+        B_re = _mm256_unpacklo_ps(A_re, A_im);
+        B_im = _mm256_unpackhi_ps(A_re, A_im);
         _mm256_storeu_ps(C + 2 * i, B_re);
         _mm256_storeu_ps(C + 2 * i + AVX_LENGTH_PRECISION, B_im);
     }
@@ -48,12 +48,11 @@ void block_mem_loader(const int N, const PRECISION *A, int lda, const PRECISION 
 
 int main()
 {
-
-    int i;
+    int i,j,nr_sweeps=10;
     // dimension of the block
     int N  = 64;
     // number of blocks
-    int nb = 50 * 1E6 / sizeof(PRECISION);
+    int nb = 1E5;
 
     PRECISION *Apt, *Bpt, *Cpt;
 
@@ -65,18 +64,26 @@ int main()
     PRECISION *B = (PRECISION *) malloc(nb * 2 * N * sizeof(PRECISION));
     PRECISION *C = (PRECISION *) malloc(nb * 2 * N * sizeof(PRECISION));
 
+    printf(" Setting random numbers ...\n");
+    for ( i=0;i<nb*N*2*N;i++ ) { A[i] = (PRECISION)rand()/(PRECISION)RAND_MAX; }
+    for ( i=0;i<nb*2*N;i++ ) { B[i] = (PRECISION)rand()/(PRECISION)RAND_MAX; }
+    for ( i=0;i<nb*2*N;i++ ) { C[i] = (PRECISION)rand()/(PRECISION)RAND_MAX; }
+    printf(" ... done\n");
+
     gettimeofday(&before, NULL);
-    for (i = 0; i < nb; i++) {
-        Apt = A + i * N * 2 * N;
-        Bpt = B + i * 2 * N;
-        Cpt = C + i * 2 * N;
-        block_mem_loader(N, Apt, N, Bpt, Cpt);
+    for ( j=0;j<nr_sweeps;j++ ) {
+        for (i = 0; i < nb; i++) {
+            Apt = A + i * N * 2 * N;
+            Bpt = B + i * 2 * N;
+            Cpt = C + i * 2 * N;
+            block_mem_loader(N, Apt, N, Bpt, Cpt);
+        }
     }
     gettimeofday(&after, NULL);
     timersub(&after, &before, &result);
 
     double elaps_time = result.tv_sec + result.tv_usec * 1.0e-6;
-    double data_size = sizeof(PRECISION) * nb * (N * 2 * N + 2 * N + 2 * N) / 1024.0 / 1024.0 / 1024.0;
+    double data_size = nr_sweeps*sizeof(PRECISION) * nb * (N * 2 * N + 2 * N + 2 * N) / 1024.0 / 1024.0 / 1024.0;
     printf(" -- time elapsed : %.10f seconds\n", elaps_time);
     printf(" -- data accessed: %f GB\n", data_size);
     printf(" -- RAM memory bandwidth: %f GB/s\n", data_size / elaps_time);
