@@ -34,11 +34,10 @@ int main(){
   gettimeofday(&before, NULL);
   for ( j=0;j<nr_sweeps;j++ ) {
     for ( i=0;i<nb;i++ ) {
-      for ( ix=0;ix<2*N;ix++ ) { C[ix] = 0.0; }
       for ( jx=0;jx<2*N;jx++ ) {
         for ( ix=0;ix<N;ix++ ) {
-          C[ix]   += A[jx*N+ix] + B[ix];
-          C[ix+N] += A[jx*N+ix] + B[ix+N];
+          C[ix]   = A[jx*N+ix] + B[ix];
+          C[ix+N] = A[jx*N+ix] + B[ix+N];
         }
       }
     }

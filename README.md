@@ -94,11 +94,11 @@ Probing RAM bandwidth loading calls in float ...
 
  ... done
 
- -- time elapsed : 2.0157350000 seconds
+ -- time elapsed : 1.4163590000 seconds
 
  -- data accessed: 31.471252 GB
 
- -- accessed data per second: 15.612793 GB/s
+ -- accessed data per second: 22.219827 GB/s
 
 ... done. Cleaning up now ...
 
@@ -112,11 +112,11 @@ Probing RAM bandwidth loading calls in double ...
 
  ... done
 
- -- time elapsed : 4.0407120000 seconds
+ -- time elapsed : 3.0817500000 seconds
 
  -- data accessed: 62.942505 GB
 
- -- accessed data per second: 15.577083 GB/s
+ -- accessed data per second: 20.424274 GB/s
 
 ... done. Cleaning up now ...
 
