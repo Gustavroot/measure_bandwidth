@@ -9,17 +9,37 @@ The following results are on a node Intel(R) Xeon(R) Platinum 8180 CPU.
 
 ## SSE:
 
+### float sse
+
 Probing RAM bandwidth with SSE loading calls in float ...
 
  Setting random numbers ...
 
  ... done
 
- -- time elapsed : 3.5295940000 seconds
+ -- time elapsed : 3.1291080000 seconds
 
  -- data accessed: 31.471252 GB
 
- -- accessed data per second: 8.916394 GB/s
+ -- accessed data per second: 10.057579 GB/s
+
+... done. Cleaning up now ...
+
+... done
+
+### double sse
+
+Probing RAM bandwidth with SSE loading calls in double ...
+
+ Setting random numbers ...
+
+ ... done
+
+ -- time elapsed : 7.5145750000 seconds
+
+ -- data accessed: 62.942505 GB
+
+ -- accessed data per second: 8.376057 GB/s
 
 ... done. Cleaning up now ...
 
@@ -58,6 +78,45 @@ Probing RAM bandwidth with AVX512 loading calls in float ...
  -- data accessed: 31.471252 GB
 
  -- RAM memory bandwidth: 10.426817 GB/s
+
+... done. Cleaning up now ...
+
+... done
+
+
+## bare (basically only memory accesses)
+
+### bare float
+
+Probing RAM bandwidth loading calls in float ...
+
+ Setting random numbers ...
+
+ ... done
+
+ -- time elapsed : 2.0157350000 seconds
+
+ -- data accessed: 31.471252 GB
+
+ -- accessed data per second: 15.612793 GB/s
+
+... done. Cleaning up now ...
+
+... done
+
+### bare double
+
+Probing RAM bandwidth loading calls in double ...
+
+ Setting random numbers ...
+
+ ... done
+
+ -- time elapsed : 4.0407120000 seconds
+
+ -- data accessed: 62.942505 GB
+
+ -- accessed data per second: 15.577083 GB/s
 
 ... done. Cleaning up now ...
 
