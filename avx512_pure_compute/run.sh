@@ -10,7 +10,8 @@ then
   echo "This bandwidth extraction with AVX-512 is supporting float only at the moment"
   exit 1
 fi
-echo "Probing RAM bandwidth with AVX512 loading calls in $PRECISION ..."
+echo "Probing 'pure compute' with SSE loading calls in $PRECISION ..."
+echo "Probing 'pure compute' with AVX512 loading calls in $PRECISION ..."
 cp main.c main_$PRECISION.c
 SUB_STRING=`echo "s/PRECISION/$PRECISION/g"`
 sed -i -e $SUB_STRING main_$PRECISION.c
